@@ -1,12 +1,9 @@
 #ifndef _WIN32
 
-#include "cloud/treadmill-tktfwd/creds.h"
+#include "creds.h"
 
 #include <errno.h>
-#include <stdio.h>
 #include <unistd.h>
-#include <string.h>
-#include <sys/stat.h>
 
 #include <gssapi/gssapi_generic.h>
 #include <gssapi/gssapi_krb5.h>
@@ -49,7 +46,7 @@ ssh_krb5_cc_gen(krb5_context ctx, krb5_ccache *ccache) {
 	}
 	close(tmpfd);
 
-    LOG(INFO) << "ticket file: " << ccname_tmp;
+    LOG(INFO) << "Ticket file: " << ccname_tmp;
 	return krb5_cc_resolve(ctx, ccname_tmp, ccache);
 }
 
@@ -66,7 +63,7 @@ ssh_gssapi_krb5_storecreds(
 	int len;
     std::string empty;
 
-    LOG(INFO) << "about to store creds: " << exportedname;
+    LOG(INFO) << "About to store creds: " << exportedname;
 	if (creds == NULL) {
         LOG(ERROR) << "No credentials storedxx";
 		return empty;
