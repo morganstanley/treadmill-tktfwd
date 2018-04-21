@@ -5,8 +5,10 @@
 #include <errno.h>
 #include <unistd.h>
 
-#include <gssapi/gssapi_generic.h>
-#include <gssapi/gssapi_krb5.h>
+extern "C" {
+    #include <gssapi/gssapi_generic.h>
+    #include <gssapi/gssapi_krb5.h>
+}
 #include <easylogging/easylogging++.h>
 
 #define krb5_get_err_text(context,code) error_message(code)
