@@ -1,7 +1,5 @@
-%define         _topdir        TOPDIR
-
 Name:           treadmill-tktfwd
-Version:        VERSION
+Version:        2.0
 Release:        2%{?dist}
 Summary:        Treadmill treadmill-tktfwd utility.
 
@@ -38,6 +36,6 @@ make install DESTDIR=$RPM_BUILD_ROOT
 
 
 %changelog
-* Tue Apr 17 2018 Andrei Keis andreikeis@noreply.github.com - 1.0-2
+* Tue Apr 17 2018 Andrei Keis andreikeis@noreply.github.com - 2.0-2
 - Initial RPM release.
 
