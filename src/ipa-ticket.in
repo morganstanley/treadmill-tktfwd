@@ -1,0 +1,99 @@
+#!/bin/bash
+
+RM=/bin/rm
+MKDIR=/bin/mkdir
+
+function usage {
+    echo Usage:
+    echo $0 --tkt-locker-dir TKT-DIR --kt-locker-dir KT-DIR
+}
+
+function run_ktadd {
+    proid=$1
+    keytab=$2
+    force=$3
+
+    if [ ! -f "$keytab" ] || [ -n "$force" ]
+    then
+        echo ... fetching keytab for $proid: $keytab
+        $RM -f $keytab
+        kadmin.local ktadd -k $keytab -norandkey $proid
+    fi
+
+    # exits 0 even if keytab was not created
+    if [ ! -f $keytab ]
+    then
+        echo ... ERROR: kadmin.local ktadd for $proid failed
+    fi
+}
+
+function run_kinit {
+    proid=$1
+    keytab=$2
+    ccache=$3
+    retry=$4
+
+    echo ... fetching tickets for $proid: $ccache
+
+    kinit -k -t $keytab -c $ccache $proid
+    if [ $? -ne 0 ]
+    then
+        echo ... ERROR: failed to obtain tickets for $proid
+        # do not retry if this is already a retry
+        if [ -n "$retry" ]
+        then
+            return
+        fi
+
+        run_ktadd $proid $keytab force
+        run_kinit $proid $keytab $ccache retry
+    fi
+}
+
+function do_tickets {
+
+    for proid in $*
+    do
+        keytab=$keytabdir/$proid
+        ccache=$ccachedir/$proid
+
+        run_ktadd $proid $keytab
+        run_kinit $proid $keytab $ccache
+    done
+}
+
+#
+# main
+#
+OPTS=`/usr/bin/getopt -o ht:k: --long help,tkt-locker-dir:,kt-locker-dir: -n 'ipa-ticket' -- "$@"`
+eval set -- "$OPTS"
+
+while true; do
+    case "$1" in
+        -t | --tkt-locker-dir ) ccachedir=$2; shift; shift ;;
+        -k | --kt-locker-dir ) keytabdir=$2; shift; shift ;;
+        -h | --help ) usage; exit; break;;
+        -- ) shift; break;;
+        * ) break;
+    esac
+done
+
+if [ -z "$ccachedir" ] || [ -z "$keytabdir" ]
+then
+    usage
+    exit
+fi
+
+if [ $EUID -ne 0 ]
+then
+    echo "ERROR: must run as root"
+    exit 1
+fi
+
+$MKDIR -p $ccachedir $keytabdir
+
+export KRB5CCNAME=FILE:$(mktemp /tmp/krb5cc-ipa-ticket-XXXX)
+kinit -k
+proids=$(ipa user-find --class proid | grep login: | awk '{print $3}')
+do_tickets $proids
+kdestroy

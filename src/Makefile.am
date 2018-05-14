@@ -1,4 +1,5 @@
 bin_PROGRAMS = tkt-send tkt-recv kt-add kt-split
+sbin_SCRIPTS = ipa-ticket
 
 tkt_send_SOURCES = \
 	tkt_send.cpp \
