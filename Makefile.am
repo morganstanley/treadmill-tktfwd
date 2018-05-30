@@ -5,11 +5,11 @@ REPO_TAG=$(shell git describe --tags --match "v*" 2>/dev/null | cut -b 2-)
 REPO_TAGFMT=$(shell echo ${REPO_TAG} | sed 's/-g/-/')
 REPO_VER=$(shell echo ${REPO_TAGFMT} | cut -d '-' -f 1)
 REPO_REL=$(shell echo ${REPO_TAGFMT} | cut -d '-' -f 2,3 | sed 's/-/_/')
+REPO_COMMITS=$(shell git log --oneline | wc -l)
 
 rpmdir=$(abs_builddir)/rpms
 
 rpm: dist
-	if [ "$(REPO_VER)" = "" ]; then echo "repo must contain 'vX.X' tag"; exit 1; fi
 	rm -rf $(rpmdir)
 	mkdir -p $(rpmdir)/SOURCES
 	mkdir -p $(rpmdir)/SRPMS
@@ -17,10 +17,11 @@ rpm: dist
 	mkdir -p $(rpmdir)/BUILD
 	mkdir -p $(rpmdir)/BUILDROOT
 	cp $(distdir).tar.gz $(rpmdir)/SOURCES
+	REPO_VER=$(REPO_VER) && REPO_REL=$(REPO_REL) && \
 	rpmbuild -ba \
            -D "_topdir $(rpmdir)" \
-           -D "_version $(REPO_VER)" \
-           -D "_release $(REPO_REL)" \
+		   -D "_version $${REPO_VER:=0.0}" \
+		   -D "_release $${REPO_REL:=$(REPO_COMMITS)}" \
            $(top_srcdir)/treadmill-tktfwd.spec
 
 install_rpm:
@@ -28,4 +29,9 @@ install_rpm:
 	mkdir -p $(rpm_install_dir)
 	rsync -r $(rpmdir)/RPMS $(rpm_install_dir)
 	rsync -r $(rpmdir)/SRPMS $(rpm_install_dir)
-	
+
+version_info:
+	@echo $(REPO_TAG)
+	@echo $(REPO_VER)
+	@echo $(REPO_REL)
+	@echo $(REPO_COMMITS)
