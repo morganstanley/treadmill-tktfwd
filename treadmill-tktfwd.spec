@@ -1,6 +1,6 @@
 Name:           treadmill-tktfwd
-Version:        2.0
-Release:        2%{?dist}
+Version:        %{_version} 
+Release:        %{_release}%{?dist}
 Summary:        Treadmill treadmill-tktfwd utility.
 
 License:        Apache 2.0
