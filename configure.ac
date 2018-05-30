@@ -1,4 +1,4 @@
-AC_INIT(treadmill-tktfwd, 2.0, andreikeis@noreply.users.github.com)
+AC_INIT(treadmill-tktfwd, m4_esyscmd_s([git describe --tags HEAD --long --match "v*" 2>/dev/null | cut -b 2- | cut -d '-' -f 1]), andreikeis@noreply.users.github.com)
 AC_CONFIG_AUX_DIR(config)
 AC_CONFIG_SRCDIR(src/tkt_send.cpp)
 AM_INIT_AUTOMAKE([tar-pax])
