@@ -28,6 +28,7 @@ make install DESTDIR=$RPM_BUILD_ROOT
 
 %files
 %defattr(-,root,root,-)
+%{_bindir}/ipa-ticket
 %{_bindir}/tkt-recv
 %{_bindir}/tkt-send
 %{_bindir}/kt-add
