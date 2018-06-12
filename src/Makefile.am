@@ -1,4 +1,4 @@
-bin_PROGRAMS = tkt-send tkt-recv kt-add kt-split
+bin_PROGRAMS = tkt-send tkt-recv kt-add kt-split k-realm
 sbin_SCRIPTS = ipa-ticket
 
 tkt_send_SOURCES = \
@@ -31,3 +31,5 @@ kt_split_SOURCES = \
 	easylogging/easylogging++.h \
 	optionparser/optionparser.h
 
+k_realm_SOURCES = \
+	k_realm.cpp
