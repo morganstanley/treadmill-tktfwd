@@ -2,6 +2,7 @@
 
 RM=/bin/rm
 MKDIR=/bin/mkdir
+REALM=$(k-realm)
 
 function usage {
     echo Usage:
@@ -54,8 +55,8 @@ function do_tickets {
 
     for proid in $*
     do
-        keytab=$keytabdir/$proid
-        ccache=$ccachedir/$proid
+        keytab=${keytabdir}/${proid}@${REALM}
+        ccache=${ccachedir}/${proid}@${REALM}
 
         run_ktadd $proid $keytab
         run_kinit $proid $keytab $ccache
