@@ -1,4 +1,4 @@
-bin_PROGRAMS = tkt-send tkt-recv kt-add kt-split k-realm
+bin_PROGRAMS = tkt-send tkt-recv kt-add kt-split k-realm k-cc-principal
 sbin_SCRIPTS = ipa-ticket
 
 tkt_send_SOURCES = \
@@ -33,3 +33,6 @@ kt_split_SOURCES = \
 
 k_realm_SOURCES = \
 	k_realm.cpp
+
+k_cc_principal_SOURCES = \
+	k_cc_principal.cpp
