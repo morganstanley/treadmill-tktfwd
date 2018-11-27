@@ -34,7 +34,6 @@ make install DESTDIR=$RPM_BUILD_ROOT
 %{_bindir}/kt-add
 %{_bindir}/kt-split
 %{_bindir}/k-realm
-%{_bindir}/k-cc-principal
 %doc
 
 
