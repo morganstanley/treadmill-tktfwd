@@ -6,3 +6,5 @@ config/
 configure
 src/Makefile.in
 build/
+.waf*
+.lock-waf*
