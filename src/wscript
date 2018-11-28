@@ -1,0 +1,90 @@
+#-*- mode: python -*-
+# vi:syntax=python
+#
+# WAF script
+#
+import sys
+
+top = '.'
+out = '.'
+
+variants = {
+    'release': {'BINSUFFIX': '', 'CXXFLAGS': {'linux': ['-O2'], 'win32': ['/Ox']}},
+    'debug': {'BINSUFFIX': '-g', 'CXXFLAGS': {'linux': ['-O0', '-g'], 'win32': ['/Zi']}}
+}
+
+
+def options(opt):
+    opt.add_option('--variant', action='store', default='debug',
+                   help='build one of {}'.format(list(variants.keys())))
+    opt.load('compiler_cxx')
+
+
+def configure(conf):
+    variant = conf.options.variant
+    if variant in variants:
+        conf.msg('Variant', '{} Suffix={} Flags={}'
+                 .format(variant,
+                         variants[variant]['BINSUFFIX'],
+                         variants[variant]['CXXFLAGS'][sys.platform]))
+        conf.env.append_value('BINSUFFIX', variants[variant]['BINSUFFIX'])
+        conf.env.append_value('CXXFLAGS', variants[variant]['CXXFLAGS'][sys.platform])
+    else:
+        raise ValueError("Unknown variant '{}', must be one of {}".format(variant, list(variants.keys())))
+
+    if sys.platform.startswith('win32'):
+        # checking compiler blows away env on windows
+        cfg = conf.env.derive()
+        cfg.detach()
+        conf.load('compiler_cxx')
+        conf.env.append_value('INCLUDES', cfg.INCLUDES)
+        conf.env.append_value('LIBPATH', cfg.LIBPATH)
+    else:
+        conf.load('compiler_cxx')
+    conf.msg('DISTRO INCLUDES', conf.env.INCLUDES)
+    conf.msg('PREFIX', conf.env.PREFIX)
+    conf.msg('BINDIR', conf.env.BINDIR)
+    conf.msg('LIBDIR', conf.env.LIBDIR)
+    conf.check_cxx(header_name='krb5.h', uselib_store='KRB', mandatory=True)
+    conf.check_cxx(header_name='com_err.h', uselib_store='KRB_ERR', mandatory=True)
+    conf.check_cxx(header_name='gssapi/gssapi.h', uselib_store='GSSAPI', mandatory=True)
+    conf.check_cxx(header_name='gssapi/gssapi_krb5.h', uselib_store='GSSAPI_KRB5', mandatory=True)
+    if sys.platform == 'linux':
+        conf.check_cxx(header_name='event.h', uselib_store='EVENT', mandatory=True)
+
+
+def build(bld):
+    if sys.platform.startswith('linux'):
+        bld.objects(name='kt',
+                    source='kt.cpp',
+                    target='kt{}'.format(bld.env.BINSUFFIX[0]),
+                    use='KRB GSSAPI', includes='.',
+                    install_path = None)
+
+        bld.program(name='kt_add',
+                    source='kt_add.cpp',
+                    target='kt_add{}'.format(bld.env.BINSUFFIX[0]),
+                    use='kt KRB GSSAPI GSSAPI_KRB5',
+                    includes='.')
+        
+        bld.program(name='kt_split',
+                    source='kt_split.cpp',
+                    target='kt_split{}'.format(bld.env.BINSUFFIX[0]),
+                    use='kt KRB GSSAPI GSSAPI_KRB5',
+                    includes='.')
+
+        bld.program(name='tkt_recv',
+                    source=['creds.cpp', 'credmgr.cpp',
+                            'tktrecv_common.cpp', 'tktrecv_server.cpp',
+                            'tktrecv_main.cpp'],
+                    target='tkt_recv{}'.format(bld.env.BINSUFFIX[0]),
+                    use='KRB KRB_ERR GSSAPI GSSAPI_KRB5 EVENT',
+                    includes='.')
+        
+        bld.program(name='tkt_send',
+                    source='tkt_send.cpp',
+                    target='tkt_send{}'.format(bld.env.BINSUFFIX[0]),
+                    use='KRB GSSAPI GSSAPI_KRB5',
+                    includes='.')
+    else:
+        print('Compilation disabled on Windows. Doing nothing.')
