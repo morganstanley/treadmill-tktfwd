@@ -4,10 +4,9 @@
 
 #include <string>
 
-extern "C" {
-    #include <gssapi/gssapi_generic.h>
-    #include <krb5.h>
-}
+#include <gssapi/gssapi_generic.h>
+#include <krb5.h>
+
 
 bool
 ssh_gssapi_krb5_init(krb5_context *context);
