@@ -4,6 +4,7 @@
 # WAF script
 #
 import sys
+from waflib import Build
 
 top = '.'
 out = '.'
@@ -41,6 +42,7 @@ def configure(conf):
         conf.env.append_value('LIBPATH', cfg.LIBPATH)
     else:
         conf.load('compiler_cxx')
+
     conf.msg('DISTRO INCLUDES', conf.env.INCLUDES)
     conf.msg('PREFIX', conf.env.PREFIX)
     conf.msg('BINDIR', conf.env.BINDIR)
@@ -49,9 +51,13 @@ def configure(conf):
     conf.check_cxx(header_name='com_err.h', uselib_store='KRB_ERR', mandatory=True)
     conf.check_cxx(header_name='gssapi/gssapi.h', uselib_store='GSSAPI', mandatory=True)
     conf.check_cxx(header_name='gssapi/gssapi_krb5.h', uselib_store='GSSAPI_KRB5', mandatory=True)
+
     if sys.platform == 'linux':
+        conf.find_program('rpmbuild', var='RPMBUILD_BIN', mandatory=False)
         conf.check_cxx(header_name='event.h', uselib_store='EVENT', mandatory=True)
 
+def rpmbuild(ctx):
+    print("Not implemented. Doing nothing...")
 
 def build(bld):
     if sys.platform.startswith('linux'):
@@ -66,7 +72,7 @@ def build(bld):
                     target='kt_add{}'.format(bld.env.BINSUFFIX[0]),
                     use='kt KRB GSSAPI GSSAPI_KRB5',
                     includes='.')
-        
+
         bld.program(name='kt_split',
                     source='kt_split.cpp',
                     target='kt_split{}'.format(bld.env.BINSUFFIX[0]),
@@ -80,7 +86,7 @@ def build(bld):
                     target='tkt_recv{}'.format(bld.env.BINSUFFIX[0]),
                     use='KRB KRB_ERR GSSAPI GSSAPI_KRB5 EVENT',
                     includes='.')
-        
+
         bld.program(name='tkt_send',
                     source='tkt_send.cpp',
                     target='tkt_send{}'.format(bld.env.BINSUFFIX[0]),

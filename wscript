@@ -4,18 +4,20 @@
 # WAF script
 #
 
-variants = {
-    'release': {'BINSUFFIX': '', 'CXXFLAGS': {'linux': ['-O2'], 'win32': ['/Ox']}},
-    'debug': {'BINSUFFIX': '-g', 'CXXFLAGS': {'linux': ['-O0', '-g'], 'win32': ['/Zi']}}
-}
+from src.localwaf import *
+
+SRCDIR='src'
 
 def options(opt):
-    opt.add_option('--variant', action='store', default='debug',
+    opt.add_option('--variant', action='store', default='prod',
                    help='build one of {}'.format(list(variants.keys())))
     opt.load('compiler_cxx')
 
 def configure(conf):
-    conf.recurse('src')
+    conf.recurse(SRCDIR)
 
 def build(bld):
-    bld.recurse('src')
+    bld.recurse(SRCDIR)
+
+def rpmbuild(ctx):
+    ctx.recurse(SRCDIR)
