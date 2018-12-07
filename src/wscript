@@ -57,7 +57,7 @@ def configure(conf):
         conf.check_cxx(header_name='event.h', uselib_store='EVENT', mandatory=True)
 
 def rpmbuild(ctx):
-    print("Not implemented. Doing nothing...")
+    pass
 
 def build(bld):
     if sys.platform.startswith('linux'):

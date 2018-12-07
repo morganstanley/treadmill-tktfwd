@@ -8,3 +8,4 @@ src/Makefile.in
 build/
 .waf*
 .lock-waf*
+__pycache__/
