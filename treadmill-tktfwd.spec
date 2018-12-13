@@ -15,17 +15,6 @@ Treadmill ticket forwarding utilities.
 %prep
 %setup -q
 
-
-%build
-%configure
-make %{?_smp_mflags}
-
-
-%install
-rm -rf $RPM_BUILD_ROOT
-make install DESTDIR=$RPM_BUILD_ROOT
-
-
 %files
 %defattr(-,root,root,-)
 %{_sbindir}/ipa-ticket

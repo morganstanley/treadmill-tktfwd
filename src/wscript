@@ -56,9 +56,6 @@ def configure(conf):
         conf.find_program('rpmbuild', var='RPMBUILD_BIN', mandatory=False)
         conf.check_cxx(header_name='event.h', uselib_store='EVENT', mandatory=True)
 
-def rpmbuild(ctx):
-    pass
-
 def build(bld):
     if sys.platform.startswith('linux'):
         bld.objects(name='kt',

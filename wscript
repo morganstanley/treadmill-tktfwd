@@ -9,6 +9,10 @@ from datetime import datetime
 from src.localwaf import *
 from waflib import Context, Errors
 
+#FIXME
+#from IPython.core.debugger import Pdb
+import pdb
+
 SRCDIR='src'
 
 def options(opt):
@@ -18,27 +22,28 @@ def options(opt):
 
 def configure(conf):
     if not conf.env.VERSION:
-        ver = 'unknown@{}_{}'.format(platform.node(),
+        ver = 'unknown_{}_{}'.format(platform.node(),
                                      datetime.strftime(datetime.now(), '%Y%m%d.%H%M%S'))
         conf.env.append_value('VERSION', ver)
-        conf.msg('VERSION', conf.env.VERSION)
-
+    conf.msg('VERSION', conf.env.VERSION) #FIXME
     conf.recurse(SRCDIR)
 
 def build(bld):
     bld.recurse(SRCDIR)
+    
+# def packageRPM(ctx):
+#     pdb.set_trace()
 
-def rpmbuild(ctx):
-    tgz = 'build/treadmill-tktfwd-{}.tar.gz'.format(ctx.env.VERSION[0])
-
-    try:
-        cmd = ['rpmbuild',
-               '-D VERSION={}'.format(ctx.env.VERSION[0]),
-               '-v',
-               '-bb',
-               'treadmill-tktfwd.spec']
-        (out, err) = ctx.cmd_and_log(cmd, shell=True, output=Context.BOTH)
-        print('STDOUT: ', out)
-        print('STDERR: ', err)
-    except Errors.WafError as e:
-        print(e.stdout, e.stderr)
+#     try:
+#         tgz = 'build/treadmill-tktfwd-{}.tar.gz'.format(ctx.env.VERSION[0])
+#         #FIXME: create tar gz
+#         cmd = ['rpmbuild',
+#                '-D "_version {}"'.format(ctx.env.VERSION[0]),
+#                '-v',
+#                '-bb',
+#                '{}/treadmill-tktfwd.spec'.format(ctx.install_path)]
+#         (out, err) = ctx.cmd_and_log(cmd, shell=True, output=Context.BOTH)
+#         print('DEBUG RPM STDOUT: ', out)
+#         print('DEBUG RPM STDERR: ', err)
+#     except Errors.WafError as e:
+#         print(e.stdout, e.stderr)
